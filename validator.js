@@ -135,7 +135,7 @@ function validateCards()
 	
 	if(output.length==0)
 	{
-		$("#output").val("No errors found card list");
+		$("#output").val("No errors found in this card list");
 	}
 	else
 	{
