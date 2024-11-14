@@ -1,2 +1,2 @@
 # Validator
-Card validator for nostalgia MTG formats.
+Simple website to validate card lists for "nostalgia" Magic the Gathering formats: https://badaro.github.io/validator
