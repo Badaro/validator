@@ -24,14 +24,14 @@ function clearLine(line)
 	return line;
 }
 
-function loadFormatData(name, callback)
+function loadFormatData(format, callback)
 {
 	console.log("LoadFormatData called");
 	
 	var url = formatRootUrl + format2015ModernSource;
-	if(name=="prefiremodern") url = formatRootUrl + formatPreFireSource;
+	if(format=="prefiremodern") url = formatRootUrl + formatPreFireSource;
 
-	if(formatData.hasOwnProperty(name))
+	if(formatData.hasOwnProperty(format))
 	{
 		callback();
 	}		
@@ -39,7 +39,7 @@ function loadFormatData(name, callback)
 	{
 		$.get(url, null, function(data)
 		{
-			formatData[name]=data;
+			formatData[format]=data;
 			callback();
 		});
 	}
@@ -90,6 +90,7 @@ function validateCards()
 {
 	console.log("ValidateCards called");
 	
+	var format = $("#format").val();
 	var input = $("#input").val();
 	var output = [];
 	var lines = input.match(/[^\r\n]+/g);
@@ -109,11 +110,25 @@ function validateCards()
 			validLines.push(line);
 			if(transform.hasOwnProperty(line)) validLines[i] = transform[line];
 		}			
+		else
+		{
+			output.push(lines[i] + " could not be parsed");
+		}
 	}
 	
 	for(var i=0;i<validLines.length;i++)
 	{
-		output.push(validLines[i]);
+		if(formatData[format].banned.includes(validLines[i]))
+		{
+			output.push(validLines[i] + " is banned");
+		}
+		else
+		{
+			if(!formatData[format].cards.includes(validLines[i]))
+			{
+				output.push(validLines[i] + " is not part of this format");
+			}
+		}
 	}
 	
 	var output = Array.from(new Set(output)); // Filter unique items
