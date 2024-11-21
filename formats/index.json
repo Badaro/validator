@@ -1,7 +1,0 @@
-{
-  "formats": 
-  [
-    { "name": "2015 Modern", "datafile":"2015modern.json" },
-    { "name": "Pre FIRE Modern", "datafile":"prefiremodern.json" }
-  ]
-}
