@@ -12,7 +12,7 @@ $(document).ready(function()
 			if(config.formats[i].key==$('#format').val()) format = config.formats[i];
 		}
 
-		validator.validate(config.rootUrl + format.datafile, format.key, $("#input").val(), function(output)
+		validator.validate(config.rootUrl + format.datafile, format.key, config.transformUrl, $("#input").val(), function(output)
 		{
 			if(output.length==0)
 			{
@@ -45,6 +45,4 @@ $(document).ready(function()
 			text: config.formats[i].name
 		}));
 	}
-
-	transform.setUrl(config.transformUrl);
 });

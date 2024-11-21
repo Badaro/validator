@@ -1,27 +1,16 @@
 var transform = {};
 transform.loaded = false;
 transform.data = [];
-transform.url = null;
 
-transform.setUrl = function(url)
+transform.init = function(url, callback)
 {
-	transform.url = url;
-};
-
-transform.init = function(callback)
-{
-	if(transform.url==null)
-	{
-		throw new Error("transform.setUrl must be called before transform.init");
-	}
-
 	if(transform.loaded)
 	{
 		callback();
 	}
 	else
 	{
-		transform.load(transform.url, true, callback)
+		transform.load(url, true, callback)
 	}
 };
 

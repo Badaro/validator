@@ -1,7 +1,7 @@
 var validator = {};
 validator.formats = [];
 
-validator.validate = function(url, key, data, callback)
+validator.validate = function(url, key, transformUrl, data, callback)
 {
 	var loaded = false;
 	for(var i=0;i<validator.formats.length;i++)
@@ -9,10 +9,10 @@ validator.validate = function(url, key, data, callback)
 		if(validator.formats[i].key==key) loaded = true;
 	}
 
-	if(loaded) validator.validateCards(key, data, callback);
+	if(loaded) validator.validateCards(key, transformUrl, data, callback);
 	else  validator.loadFormat(url, key, function()
 	{
-		validator.validateCards(key, data, callback)
+		validator.validateCards(key, transformUrl, data, callback)
 	});
 };
 
@@ -28,11 +28,11 @@ validator.loadFormat = function(url, key, callback)
 	});
 };
 
-validator.validateCards = function(key, data, callback)
+validator.validateCards = function(key, transformUrl, data, callback)
 {
 	console.log("validator.validateCards called");
 
-	transform.init(function()
+	transform.init(transformUrl, function()
 	{
 
 		if(data.length==0)
