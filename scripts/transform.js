@@ -41,9 +41,9 @@ transform.load = function(url, hasMore, callback)
 
 transform.normalize = function(card)
 {
-	if(transform.data==null)
+	if(!transform.loaded)
 	{
-		throw new Error("transform.setUrl and transform.init must be called before transform.normalize");
+		throw new Error("transform.init must be called before transform.normalize");
 	}
 
 	for(var i=0;i<transform.data.length;i++)
