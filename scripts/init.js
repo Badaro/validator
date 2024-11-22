@@ -5,6 +5,8 @@ $(document).ready(function()
 	$("#validate").click(function()
 	{
 		console.log("#validate.click called");
+		
+		$("#output").val("Loading data, please wait...");
 
 		var format = null;
 		for(var i=0;i<config.formats.length;i++)
