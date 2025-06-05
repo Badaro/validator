@@ -6,6 +6,7 @@ config.formats = [
   { "name": "Pre FIRE Modern", "key": "prefiremodern", "datafile":"formats/prefiremodern.json" },
   { "name": "Premodern", "key": "premodern", "datafile":"formats/premodern.json" },
   { "name": "Classic Legacy", "key": "classiclegacy", "datafile":"formats/classiclegacy.json" },
+  { "name": "Pre-Horizons Modern", "key": "prehorizonsmodern", "datafile":"formats/prehorizonsmodern.json" }
 ];
 console.log("Configuration set successfully");
 console.log(config);
