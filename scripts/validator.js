@@ -1,19 +1,19 @@
 var validator = {};
 validator.formats = [];
 
-validator.validate = function(url, key, transformUrl, data, callback)
+validator.validate = function(url, key, data, callback)
 {
-	var loaded = false;
-	for(var i=0;i<validator.formats.length;i++)
+	if(validator.formats[key])
 	{
-		if(validator.formats[i].key==key) loaded = true;
-	}
-
-	if(loaded) validator.validateCards(key, transformUrl, data, callback);
-	else  validator.loadFormat(url, key, function()
+		validator.validateCards(key, data, callback);
+	} 
+	else
 	{
-		validator.validateCards(key, transformUrl, data, callback)
-	});
+		validator.loadFormat(url, key, function()
+		{
+			validator.validateCards(key, data, callback)
+		});
+	}  
 };
 
 validator.loadFormat = function(url, key, callback)
@@ -23,63 +23,70 @@ validator.loadFormat = function(url, key, callback)
 	$.get(url, null, function(data)
 	{
 		data.key = key;
+		data.transform = [];
+
+		for(var i=0;i<data.cards.length;i++)
+		{
+			if(data.cards[i].includes(" // "))
+			{
+				var front = data.cards[i].split(" // ")[0];
+				data.transform.push({ "front": front, "name": data.cards[i] });
+			}
+		}
+
 		validator.formats.push(data);
 		callback();
 	});
 };
 
-validator.validateCards = function(key, transformUrl, data, callback)
+validator.validateCards = function(key, data, callback)
 {
 	console.log("validator.validateCards called");
 
-	transform.init(transformUrl, function()
+	if(data.length==0)
 	{
-
-		if(data.length==0)
+		callback([]);
+	} 
+	else
+	{
+		var format = null;
+		for(var i=0;i<validator.formats.length;i++)
 		{
-			callback([]);
-		} 
-		else
-		{
-			var format = null;
-			for(var i=0;i<validator.formats.length;i++)
-			{
-				if(validator.formats[i].key==key) format = validator.formats[i];
-			}
+			if(validator.formats[i].key==key) format = validator.formats[i];
+		}
 
-			var lines = data.match(/[^\r\n]+/g);
-			var validLines = [];
-			for(var i=0;i<lines.length;i++)
+		var lines = data.match(/[^\r\n]+/g);
+		var validLines = [];
+		for(var i=0;i<lines.length;i++)
+		{
+			var clearLine = validator.clearLine(lines[i]);
+			if(validator.isValidLine(clearLine)) validLines.push(validator.normalizeMultiFace(format, clearLine));
+		}
+		
+		var output = [];
+		for(var i=0;i<validLines.length;i++)
+		{
+			if(validator.includesCaseInsensitive(validLines[i], format.banned))
 			{
-				var clearLine = validator.clearLine(lines[i]);
-				if(validator.isValidLine(clearLine)) validLines.push(transform.normalize(clearLine));
+				var errorMessage = validLines[i] + " is banned in this format";
+				output.push({ "error": true, "message": errorMessage, "card": validLines[i] });
 			}
-			
-			var output = [];
-			for(var i=0;i<validLines.length;i++)
+			else
 			{
-				if(validator.includesCaseInsensitive(validLines[i], format.banned))
+				if(!validator.includesCaseInsensitive(validLines[i], format.cards))
 				{
-					var errorMessage = validLines[i] + " is banned in this format";
+					var errorMessage = validLines[i] + " is not part of this format";
 					output.push({ "error": true, "message": errorMessage, "card": validLines[i] });
 				}
 				else
 				{
-					if(!validator.includesCaseInsensitive(validLines[i], format.cards))
-					{
-						var errorMessage = validLines[i] + " is not part of this format";
-						output.push({ "error": true, "message": errorMessage, "card": validLines[i] });
-					}
-					else
-					{
-						output.push({ "error": false, "message": "OK", "card": validLines[i] });
-					}
+					output.push({ "error": false, "message": "OK", "card": validLines[i] });
 				}
 			}
-
-			callback(output)
 		}
-	});	
+
+		callback(output)
+	}
 };
 
 validator.includesCaseInsensitive = function(value, list)
@@ -107,4 +114,17 @@ validator.clearLine = function(line)
 	line = line.replace(/^\s+/gm, "");  // Trims leading space
 	line = line.replace(/\s+$/gm, "");  // Trims trailing space
 	return line;
+};
+
+validator.normalizeMultiFace = function(format, card)
+{
+	for(var i=0;i<format.transform.length;i++)
+	{
+		if(card.toLowerCase()==format.transform[i].front.toLowerCase()) 
+		{
+			console.log(card + " normalized to " + format.transform[i].name)
+			return format.transform[i].name;
+		}
+	}
+	return card;
 };
